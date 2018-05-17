@@ -13,7 +13,7 @@ firebase.initializeApp({
 
 });
 const db = firebase.firestore();
-const settings = {/* your settings... */ timestampsInSnapshots: true};
+const settings = { timestampsInSnapshots: true };
 db.settings(settings);
 
 console.log('created database')

@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text, ImageBackground, TextInput, Button } from 'react-native';
+import { StyleSheet, View, Text, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import db from '../db';
+import * as firebase from 'firebase';
 
 export default class LandingPage extends React.Component {
 
@@ -8,7 +9,8 @@ export default class LandingPage extends React.Component {
     super();
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      error: ''
     }
   }
 
@@ -17,15 +19,30 @@ export default class LandingPage extends React.Component {
   }
 
   signUp() {
-    db.collection('users').add({
-      email: this.state.email,
-      password: this.state.password
-    });
+    // db.collection('users').add({
+    //   email: this.state.email,
+    //   password: this.state.password
+    // });
+    firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch(err => {
+      console.log(err.message)
+    })
     this.setState({ email: '', password: '' })
   }
 
+  signIn() {
+    firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+      .then(data => {
+        if (data.user) this.setState({ email: '', password: '', error: '' });
+        this.props.navigation.navigate('UserPage');
+      })
+      .catch(err => {
+        this.setState({error: err.message})
+        console.log(err.message)
+      })
+  }
+
   render() {
-    const { email, password } = this.state;
+    const { email, password, error } = this.state;
 
     return (
       <ImageBackground style={styles.image} source={require('../scorecard.jpg')}>
@@ -46,7 +63,15 @@ export default class LandingPage extends React.Component {
             value={password}
             onChangeText={(password) => this.handleInputChange('password', password)}
           />
-          <Button title="Sign In" onPress={() => this.signUp()} />
+          {
+            error && <Text>{error}</Text>
+          }
+          <TouchableOpacity style={styles.button} onPress={() => this.signIn()}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => this.signUp()}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     );
@@ -76,5 +101,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderBottomWidth: 2,
     borderColor: 'gray'
+  },
+  button: {
+    backgroundColor: 'white',
+    height: 40,
+    width: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 5,
+    shadowColor: 'black',
+    shadowRadius: 5,
+    shadowOffset: {width: 5, height: 5},
+    shadowOpacity: 0.4
+  },
+  buttonText: {
+    fontSize: 20
   }
 });

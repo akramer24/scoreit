@@ -1,6 +1,6 @@
 import { createStackNavigator } from 'react-navigation';
 // import { LandingPage } from './components';
-import LandingPage from './components/LandingPage';
+import {LandingPage, UserPage} from './components';
 
 const RootNavigator = createStackNavigator(
   {
@@ -9,6 +9,9 @@ const RootNavigator = createStackNavigator(
       navigationOptions: {
         title: 'Score It'
       }
+    },
+    UserPage: {
+      screen: UserPage
     }
   }, {
     initialRouteName: 'LandingPage'
